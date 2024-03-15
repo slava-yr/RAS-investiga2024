@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "UbidotsEsp32Mqtt.h"
+#include <HTTPClient.h>
+#include <UrlEncode.h>
 
 /* Constants */
 const char *UBIDOTS_TOKEN = "BBUS-G2915in2XhcsKsUwzMrUvmfqWsp4nb";  // Ubidots TOKEN
@@ -15,6 +17,34 @@ Ubidots ubidots(UBIDOTS_TOKEN); // Intialize ubidots
 
 uint8_t analogPin = 36;
 
+// For WhatsApp 
+String phoneNumber = "+51943402428";
+String apiKey = "8147172";
+
+void sendMessage(String message){
+  // Data to send with HTTP POST
+  String url = "https://api.callmebot.com/whatsapp.php?phone=" + phoneNumber + "&apikey=" + apiKey + "&text=" + urlEncode(message);    
+  HTTPClient http;
+  http.begin(url);
+
+  // Specify content-type header
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  
+  // Send HTTP POST request
+  int httpResponseCode = http.POST(url);
+  if (httpResponseCode == 200){
+    Serial.print("Message sent successfully");
+  }
+  else{
+    Serial.println("Error sending the message");
+    Serial.print("HTTP response code: ");
+    Serial.println(httpResponseCode);
+  }
+
+  // Free resources
+  http.end();
+}
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -22,8 +52,7 @@ void setup()
   ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
   ubidots.setup();
   ubidots.reconnect();
-
-  timer = millis();
+  timer = millis(); // Iniatilize timer
 }
 
 void loop()
@@ -37,6 +66,8 @@ void loop()
     float value = analogRead(analogPin);
     ubidots.add(VARIABLE_LABEL, value); 
     ubidots.publish(DEVICE_LABEL);
+    // String mensaje = "Valor actualizado en Ubidots: " + String(value);
+    // sendMessage(mensaje);
     timer = millis();
   }
   // ubidots.loop();
