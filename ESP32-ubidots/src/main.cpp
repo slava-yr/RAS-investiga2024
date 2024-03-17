@@ -2,6 +2,7 @@
 #include <HTTPClient.h>
 #include <UrlEncode.h>
 #include "time.h"
+#include <Adafruit_AHTX0.h>
 
 /* Constants */
 // Wifi
@@ -12,7 +13,7 @@ const char *WIFI_PASS = "hjupb35239";      // Wi-Fi password
 const char *DEVICE_LABEL = "esp32"; // ESP32 
 const char *VARIABLE_LABEL = "potvalue"; 
 const char *AMB_TEMP_LABEL = "amb_temperature";
-const char *AMP_HUM_LABEL = "rel_humidity";
+const char *AMB_HUM_LABEL = "rel_humidity";
 const String AMB_TEMP_ID = "65f7253c22b0df25a943b6ba";
 const char *UBI_TOKEN_API = "BBUS-bVtde0QdG4qcGbS1CP8rfa3MYacQnM"; // Token to use the API (request agg values)
 const int PUBLISH_FREQUENCY = 5000; // Update rate in milliseconds
@@ -24,6 +25,9 @@ const String phoneNumber = "+51943402428";
 const String apiKey = "8147172"; // WhatsApp API key
 /*----------------------------------------------------------------------------*/
 
+/*Definitions*/
+Adafruit_AHTX0 aht; 
+Adafruit_Sensor *aht_humidity, *aht_temp;
 Ubidots ubidots(UBIDOTS_TOKEN); // Ubidots
 
 uint8_t analogPin = 36;
@@ -104,6 +108,11 @@ void setup()
   ubidots.setDebug(true);  // Debug messages
   timer = millis(); // Iniatilize timer
   configTime(0, 0, ntpServer); // Epoch time
+  if (!aht.begin()) {
+    Serial.println("No encontró módulo de AHT10/AHT20");
+  }
+  aht_temp = aht.getTemperatureSensor();
+  aht_humidity = aht.getHumiditySensor();
 }
 
 void loop()
@@ -114,8 +123,14 @@ void loop()
   }
   if (abs(static_cast<long int>(millis() - timer)) > PUBLISH_FREQUENCY) // triggers the routine every 5 seconds
   {
-    float value = analogRead(analogPin);
-    ubidots.add(VARIABLE_LABEL, value); 
+    sensors_event_t humidity;
+    sensors_event_t temp;
+    aht_humidity->getEvent(&humidity);
+    aht_temp->getEvent(&temp);
+
+    ubidots.add(AMB_TEMP_LABEL, temp.temperature); 
+    // ubidots.publish(DEVICE_LABEL);
+    ubidots.add(AMB_HUM_LABEL, humidity.relative_humidity); 
     ubidots.publish(DEVICE_LABEL);
     timer = millis();
   }

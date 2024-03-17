@@ -22,10 +22,10 @@ void setup() {
 
   Serial.println("AHT10/AHT20 enconntrado!");
   aht_temp = aht.getTemperatureSensor();
-  aht_temp->printSensorDetails();
+  // aht_temp->printSensorDetails();
 
   aht_humidity = aht.getHumiditySensor();
-  aht_humidity->printSensorDetails();
+  // aht_humidity->printSensorDetails();
 
 }
 
