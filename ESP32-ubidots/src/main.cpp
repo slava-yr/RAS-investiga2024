@@ -11,10 +11,11 @@ const char *WIFI_SSID = "dlink-3050";      // Wi-Fi SSID
 const char *WIFI_PASS = "hjupb35239";      // Wi-Fi password
 // Ubidots
 const char *DEVICE_LABEL = "esp32"; // ESP32 
-const char *VARIABLE_LABEL = "potvalue"; 
-const char *AMB_TEMP_LABEL = "amb_temperature";
-const char *AMB_HUM_LABEL = "rel_humidity";
+const char *AMB_TEMP_LABEL = "amb_temperature"; // aht10 
+const char *AMB_HUM_LABEL = "rel_humidity"; // aht10
+const char *BOD_TEMP_LABEL = "body_temp"; // mlx
 const String AMB_TEMP_ID = "65f7253c22b0df25a943b6ba";
+const String BOD_TEMP_ID = "65f78896fc402642f37a5374";
 const char *UBI_TOKEN_API = "BBUS-bVtde0QdG4qcGbS1CP8rfa3MYacQnM"; // Token to use the API (request agg values)
 const int PUBLISH_FREQUENCY = 5000; // Update rate in milliseconds
 unsigned long timer;
@@ -29,8 +30,7 @@ const String apiKey = "8147172"; // WhatsApp API key
 Adafruit_AHTX0 aht; 
 Adafruit_Sensor *aht_humidity, *aht_temp;
 Ubidots ubidots(UBIDOTS_TOKEN); // Ubidots
-
-uint8_t analogPin = 36;
+/*--------------------------------------------*/
 
 /*Functions*/
 void sendMessage(String message){
@@ -128,9 +128,10 @@ void loop()
     aht_humidity->getEvent(&humidity);
     aht_temp->getEvent(&temp);
 
-    ubidots.add(AMB_TEMP_LABEL, temp.temperature); 
-    // ubidots.publish(DEVICE_LABEL);
-    ubidots.add(AMB_HUM_LABEL, humidity.relative_humidity); 
+    float amb_temperature = temp.temperature, amb_humidity = humidity.relative_humidity;
+    ubidots.add(AMB_TEMP_LABEL, amb_temperature); 
+    ubidots.add(AMB_HUM_LABEL, amb_humidity); 
+    // ubidots.add(BOD_TEMP_LABEL, value);
     ubidots.publish(DEVICE_LABEL);
     timer = millis();
   }
