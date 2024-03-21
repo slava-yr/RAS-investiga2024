@@ -3,12 +3,13 @@
 #include <UrlEncode.h>
 #include "time.h"
 #include <Adafruit_AHTX0.h>
+#include <Adafruit_MLX90614.h>
 
 /* Constants */
 // Wifi
 const char *UBIDOTS_TOKEN = "BBUS-G2915in2XhcsKsUwzMrUvmfqWsp4nb";  // Ubidots TOKEN
-const char *WIFI_SSID = "dlink-3050";      // Wi-Fi SSID
-const char *WIFI_PASS = "hjupb35239";      // Wi-Fi password
+const char *WIFI_SSID = "redpucp";      // Wi-Fi SSID
+const char *WIFI_PASS = "C9AA28BA93";      // Wi-Fi password
 // Ubidots
 const char *DEVICE_LABEL = "esp32"; // ESP32 
 const char *AMB_TEMP_LABEL = "amb_temperature"; // aht10 
@@ -29,7 +30,9 @@ const String apiKey = "8147172"; // WhatsApp API key
 /*Definitions*/
 Adafruit_AHTX0 aht; 
 Adafruit_Sensor *aht_humidity, *aht_temp;
+Adafruit_MLX90614 mlx = Adafruit_MLX90614 (); 
 Ubidots ubidots(UBIDOTS_TOKEN); // Ubidots
+
 /*--------------------------------------------*/
 
 /*Functions*/
@@ -113,6 +116,7 @@ void setup()
   }
   aht_temp = aht.getTemperatureSensor();
   aht_humidity = aht.getHumiditySensor();
+  mlx.begin();
 }
 
 void loop()
@@ -129,9 +133,10 @@ void loop()
     aht_temp->getEvent(&temp);
 
     float amb_temperature = temp.temperature, amb_humidity = humidity.relative_humidity;
+    float body_temp = mlx.readObjectTempC();
     ubidots.add(AMB_TEMP_LABEL, amb_temperature); 
     ubidots.add(AMB_HUM_LABEL, amb_humidity); 
-    // ubidots.add(BOD_TEMP_LABEL, value);
+    ubidots.add(BOD_TEMP_LABEL, body_temp);
     ubidots.publish(DEVICE_LABEL);
     timer = millis();
   }
