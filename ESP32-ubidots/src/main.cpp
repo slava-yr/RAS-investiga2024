@@ -133,10 +133,18 @@ void loop()
     aht_temp->getEvent(&temp);
 
     float amb_temperature = temp.temperature, amb_humidity = humidity.relative_humidity;
+<<<<<<< Updated upstream
     float body_temp = mlx.readObjectTempC();
     ubidots.add(AMB_TEMP_LABEL, amb_temperature); 
     ubidots.add(AMB_HUM_LABEL, amb_humidity); 
     ubidots.add(BOD_TEMP_LABEL, body_temp);
+=======
+    float body_temperature = mlx.readObjectTempC();
+
+    ubidots.add(AMB_TEMP_LABEL, amb_temperature); 
+    ubidots.add(AMB_HUM_LABEL, amb_humidity); 
+    ubidots.add(BOD_TEMP_LABEL, body_temperature);
+>>>>>>> Stashed changes
     ubidots.publish(DEVICE_LABEL);
     timer = millis();
   }
