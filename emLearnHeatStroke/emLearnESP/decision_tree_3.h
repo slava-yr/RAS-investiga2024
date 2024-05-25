@@ -1,12 +1,10 @@
-
 #include <eml_trees.h>
-    
 
 static const EmlTreesNode tree_3_nodes[4] = {
   { 4, 38.640575f, 1, 3 },
   { 5, 0.394070f, 1, -1 },
   { 1, 100.617798f, -2, -2 },
-  { 1, 81.846794f, -2, -1 } 
+  { 5, 0.099744f, -2, -1 } 
 };
 
 static const int32_t tree_3_tree_roots[1] = { 0 };
@@ -21,7 +19,7 @@ EmlTrees tree_3 = {
         2,
         (uint8_t *)(tree_3_leaves),
         0,
-        9,
+        7,
         2,
     };
 
@@ -37,7 +35,7 @@ static inline int32_t tree_3_tree_0(const float *features, int32_t features_leng
                   return 1;
               }
           } else {
-              if (features[1] < 81.846794f) {
+              if (features[5] < 0.099744f) {
                   return 0;
               } else {
                   return 1;
